@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemeProvider } from "styled-components";
+import NavController from "./components/NavController";
+import { AuthProvider } from "./AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import theme from "./styles";
 
 export default function App() {
   const [loaded, setLoaded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
   const preLoad = async () => {
     try {
       await Font.loadAsync({
@@ -17,14 +22,22 @@ export default function App() {
     } catch (e) {
       console.log(e);
     }
+    const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+    if (!isLoggedIn || isLoggedIn === "false") {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
   };
   useEffect(() => {
     preLoad();
   });
   return loaded ? (
-    <View>
-      <Text>Hello It work!</Text>
-    </View>
+    <ThemeProvider theme={theme}>
+      <AuthProvider isLoggedIn={isLoggedIn}>
+        <NavController />
+      </AuthProvider>
+    </ThemeProvider>
   ) : (
     <AppLoading />
   );
