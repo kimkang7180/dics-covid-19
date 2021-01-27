@@ -3,7 +3,7 @@ import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemeProvider } from "styled-components";
+import { ThemeProvider } from "styled-components/native";
 import NavController from "./components/NavController";
 import { AuthProvider } from "./AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";

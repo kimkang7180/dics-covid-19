@@ -5,6 +5,8 @@ import { Alert } from "react-native";
 import AuthButton from "../../components/AuthButton";
 import AuthInput from "../../components/AuthInput";
 import useInput from "../../hooks/useInput";
+import { authService } from "../../fbase";
+import { useLogIn } from "../../AuthContext";
 
 const View = styled.View`
   justify-content: center;
@@ -12,57 +14,56 @@ const View = styled.View`
   flex: 1;
 `;
 
-const FBContainer = styled.View`
-  margin-top: 25px;
-  padding-top: 25px;
-  border-top-width: 1px;
-  border-color: ${(props) => props.theme.lightGreyColor};
-  border-style: solid;
-`;
-
-const GoogleContainer = styled.View`
-  margin-top: 20px;
-`;
-
 export default ({ navigation, route }: any) => {
-  const usernameInput = useInput(route.params ? route.params.username : "");
+  const emailInput = useInput(route.params ? route.params.email : "");
   const passwordInput = useInput("");
+  const logIn = useLogIn();
   const [loading, setLoading] = useState(false);
-  /*const createAccountMutation = useMutation(CREATE_ACCOUNT, {
-    variables: {
-      username: usernameInput.value,
-      email: emailInput.value,
-      firstName: fNameInput.value,
-      lastName: lNameInput.value,
-    },
-  });*/
   const handleSingup = async () => {
-    const { value: username } = usernameInput;
+    const { value: email } = emailInput;
     const { value: password } = passwordInput;
-    if (username === "") {
+    console.log(emailInput, passwordInput);
+    if (email === "") {
       return Alert.alert("Invalid username");
-    }
-    try {
-      setLoading(true);
-      // Firebase 회원가입 적용 예정
-      /*const {
-        data: { createAccount },
-      } = await createAccountMutation();*/
-      // To Do : Log User In
-    } catch (e) {
-      console.log(e);
-      Alert.alert("Username taken.", "Log in instead");
-      navigation.navigate("Login", { username });
-    } finally {
-      setLoading(false);
+    } else if (password === "") {
+      return Alert.alert("Invalid password");
+    } else {
+      try {
+        setLoading(true);
+        console.log(email, password);
+        authService
+          .createUserWithEmailAndPassword(email, password)
+          .then((user) => {
+            logIn(email, password);
+            console.log(user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode, errorMessage);
+          });
+        // To Do : Log User In
+      } catch (e) {
+        console.log(e);
+        Alert.alert("Username taken.", "Log in instead");
+        navigation.navigate("Login", { email });
+      } finally {
+        setLoading(false);
+      }
     }
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View>
         <AuthInput
-          {...usernameInput}
-          placeholder="Username"
+          {...emailInput}
+          placeholder="Email"
+          returnKeyType="send"
+          autoCorrect={false}
+        />
+        <AuthInput
+          {...passwordInput}
+          placeholder="Password"
           returnKeyType="send"
           autoCorrect={false}
         />

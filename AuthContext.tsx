@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authService } from "./fbase";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -16,11 +17,19 @@ export const AuthProvider = ({
   children,
 }: AuthProviderType) => {
   const [isLoggedIn, setIsLoggedIn] = useState(isLoggedInProp);
-  const logUserIn = async ({ token }: any) => {
+  const logUserIn = async ({ email, password }: any) => {
     try {
-      await AsyncStorage.setItem("isLoggedIn", "true");
-      await AsyncStorage.setItem("jwt", token);
-      setIsLoggedIn(true);
+      authService
+        .signInWithEmailAndPassword(email, password)
+        .then(async (user) => {
+          setIsLoggedIn(true);
+          await AsyncStorage.setItem("isLoggedIn", "true");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+        });
     } catch (e) {
       console.log(e);
     }
@@ -28,8 +37,15 @@ export const AuthProvider = ({
 
   const logUserOut = async () => {
     try {
-      await AsyncStorage.setItem("isLoggedIn", "false");
-      setIsLoggedIn(false);
+      authService
+        .signOut()
+        .then(async () => {
+          await AsyncStorage.setItem("isLoggedIn", "false");
+          setIsLoggedIn(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } catch (e) {
       console.log(e);
     }

@@ -5,6 +5,7 @@ import AuthButton from "../../components/AuthButton";
 import AuthInput from "../../components/AuthInput";
 import useInput from "../../hooks/useInput";
 import { Alert } from "react-native";
+import { useLogIn } from "../../AuthContext";
 
 const View = styled.View`
   justify-content: center;
@@ -13,36 +14,22 @@ const View = styled.View`
 `;
 
 export default ({ route, navigation }: any) => {
-  const usernameInput = useInput(route.params ? route.params.username : "");
+  const emailInput = useInput(route.params ? route.params.email : "");
   const passwordInput = useInput("");
+  const logIn = useLogIn();
   const [loading, setLoading] = useState(false);
-  /*
-  const requestSecretMutation = useMutation(LOG_IN, {
-    variables: {
-      email: emailInput.value,
-    },
-  });*/
   const handleLogin = async () => {
-    const { value: username } = usernameInput;
+    const { value: email } = emailInput;
     const { value: password } = passwordInput;
-    if (username === "") {
+    if (email === "") {
       return Alert.alert("User name can't be empty");
     } else if (password === "") {
       return Alert.alert("Password can't be empty");
     }
     try {
       setLoading(true);
-      // To Do: Firebase Log In
-      /*const {
-        data: { requestSecret },
-      } = await requestSecretMutation();
-      */
-      /*if (requestSecret) {
-        // To Do: Navigate User to Home
-      } else {*/
-      Alert.alert("Account not found");
-      navigation.navigate("Signup", { username });
-      //}
+      logIn(email, password);
+      console.log("Good");
     } catch (e) {
       console.log(e);
       Alert.alert("Can't log in now");
@@ -54,7 +41,7 @@ export default ({ route, navigation }: any) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View>
         <AuthInput
-          {...usernameInput}
+          {...emailInput}
           placeholder="Name"
           returnKeyType="send"
           autoCorrect={false}

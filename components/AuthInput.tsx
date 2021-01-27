@@ -6,14 +6,6 @@ const Container = styled.View`
   margin-bottom: 10px;
 `;
 
-const TextInput = styled.TextInput`
-  width: ${constants.width / 1.7};
-  padding: 10px;
-  background-color: ${(props) => props.theme.greyColor};
-  border: 0.5px solid ${(props) => props.theme.darkGreyColor};
-  border-radius: 4px;
-`;
-
 type AuthInputType = {
   placeholder: String;
   value: String;
@@ -30,6 +22,14 @@ type AuthInputType = {
   onSubmitEditing?: Function;
   autoCorrect?: Boolean;
 };
+
+const TextInput = styled.TextInput<any>`
+  width: ${constants.width / 1.7};
+  padding: 10px;
+  background-color: ${(props) => props.theme.greyColor};
+  border: 0.5px solid ${(props) => props.theme.darkGreyColor};
+  border-radius: 4px;
+`;
 
 const AuthInput = ({
   placeholder,
